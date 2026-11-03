@@ -19,21 +19,42 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Prepare Drawable Folder & Icon
+      - name: Generate gradle.properties & Drawable Icon
         run: |
+          echo "android.useAndroidX=true" > gradle.properties
+          echo "org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8" >> gradle.properties
           mkdir -p app/src/main/res/drawable
+          rm -f app/src/main/res/drawable/ic_wifi_5_lock.*
           if [ -f "1.jpeg" ]; then
-            cp "1.jpeg" app/src/main/res/drawable/ic_wifi_5_lock.png
+            cp "1.jpeg" app/src/main/res/drawable/ic_wifi_5_lock.jpg
           elif [ -f "1.jpg" ]; then
-            cp "1.jpg" app/src/main/res/drawable/ic_wifi_5_lock.png
+            cp "1.jpg" app/src/main/res/drawable/ic_wifi_5_lock.jpg
           elif [ -f "1.png" ]; then
             cp "1.png" app/src/main/res/drawable/ic_wifi_5_lock.png
+          else
+            cat << 'EOF' > app/src/main/res/drawable/ic_wifi_5_lock.xml
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              android:width="24dp"
+              android:height="24dp"
+              android:viewportWidth="24"
+              android:viewportHeight="24">
+              <path
+                  android:fillColor="#FFFFFF"
+                  android:pathData="M12,3C7.79,3 3.7,4.41 0.38,7C4.41,12.06 7.89,16.37 12,21.5C16.08,16.42 20.24,11.24 23.65,7C20.32,4.41 16.22,3 12,3Z"/>
+          </vector>
+          EOF
           fi
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+      - name: Setup Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
 
       - name: Build Debug APK
-        uses: gradle/actions/setup-gradle@v3
+        run: gradle assembleDebug --no-daemon
+
+      - name: Upload Compiled APK
+        uses: actions/upload-artifact@v4
         with:
-          arguments: assembleDebug
+          name: OneWiFi-Direct-APK
+          path: app/build/outputs/apk/debug/app-debug.apk
