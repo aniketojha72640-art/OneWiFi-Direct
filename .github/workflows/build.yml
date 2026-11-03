@@ -19,10 +19,19 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Generate gradle.properties & Drawable Icon
+      - name: Prepare Project Files, gradle.properties & Drawable Icon
         run: |
+          # Fix root build.gradle.kts filename if needed
+          if [ -f "root build.gradle.kts" ]; then
+            mv "root build.gradle.kts" "build.gradle.kts"
+          fi
+
+          # Create gradle.properties required for Jetpack Compose / AndroidX
           echo "android.useAndroidX=true" > gradle.properties
+          echo "android.enableJetifier=true" >> gradle.properties
           echo "org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8" >> gradle.properties
+
+          # Prepare drawable directory and icon (1.jpeg / 1.jpg / 1.png)
           mkdir -p app/src/main/res/drawable
           rm -f app/src/main/res/drawable/ic_wifi_5_lock.*
           if [ -f "1.jpeg" ]; then
@@ -34,12 +43,12 @@ jobs:
           else
             cat << 'EOF' > app/src/main/res/drawable/ic_wifi_5_lock.xml
           <vector xmlns:android="http://schemas.android.com/apk/res/android"
-              android:width="24dp"
-              android:height="24dp"
+              android:width="32dp"
+              android:height="32dp"
               android:viewportWidth="24"
               android:viewportHeight="24">
               <path
-                  android:fillColor="#FFFFFF"
+                  android:fillColor="#E4E4E7"
                   android:pathData="M12,3C7.79,3 3.7,4.41 0.38,7C4.41,12.06 7.89,16.37 12,21.5C16.08,16.42 20.24,11.24 23.65,7C20.32,4.41 16.22,3 12,3Z"/>
           </vector>
           EOF
