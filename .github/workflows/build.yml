@@ -19,27 +19,21 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Prepare Drawable Folder & Icon (1.jpeg / 1.jpg / 1.png)
+      - name: Prepare Drawable Folder & Icon
         run: |
           mkdir -p app/src/main/res/drawable
           if [ -f "1.jpeg" ]; then
-            convert "1.jpeg" app/src/main/res/drawable/ic_wifi_5_lock.png
+            cp "1.jpeg" app/src/main/res/drawable/ic_wifi_5_lock.png
           elif [ -f "1.jpg" ]; then
-            convert "1.jpg" app/src/main/res/drawable/ic_wifi_5_lock.png
+            cp "1.jpg" app/src/main/res/drawable/ic_wifi_5_lock.png
           elif [ -f "1.png" ]; then
             cp "1.png" app/src/main/res/drawable/ic_wifi_5_lock.png
           fi
 
-      - name: Setup Gradle 8.7
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.7'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
 
       - name: Build Debug APK
-        run: gradle assembleDebug --no-daemon --stacktrace
-
-      - name: Upload Compiled APK
-        uses: actions/upload-artifact@v4
+        uses: gradle/actions/setup-gradle@v3
         with:
-          name: OneWiFi-Direct-APK
-          path: app/build/outputs/apk/debug/app-debug.apk
+          arguments: assembleDebug
